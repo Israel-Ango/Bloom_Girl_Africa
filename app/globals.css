@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --bloom-purple: #7C3AED;
+  --bloom-pink: #EC4899;
+  --bloom-gold: #F59E0B;
+  --bloom-light: #FAF5FF;
+  --bloom-dark: #1E1B4B;
+  --background: #FAF5FF;
+  --foreground: #1E1B4B;
+}
+
+.dark {
+  --background: #0F0A1E;
+  --foreground: #F3E8FF;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(124, 58, 237, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.6); }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.float-animation { animation: float 3s ease-in-out infinite; }
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+.gradient-bloom {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F59E0B 100%);
+}
+
+.gradient-bloom-soft {
+  background: linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 50%, #FEF3C7 100%);
+}
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
+}
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
