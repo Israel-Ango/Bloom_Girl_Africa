@@ -1,18 +1,86 @@
 @import "tailwindcss";
 
-:root {
-  --bloom-purple: #7C3AED;
-  --bloom-pink: #EC4899;
-  --bloom-gold: #F59E0B;
-  --bloom-light: #FAF5FF;
-  --bloom-dark: #1E1B4B;
-  --background: #FAF5FF;
-  --foreground: #1E1B4B;
+/* ═══════════════════════════════════════════════════
+   BLOOM GIRL AFRICA — ELEGANT HERITAGE PALETTE
+   Blush Pink · Deep Forest Green · Sunflower Gold
+   Inspired by the Bloom Girl Africa logo
+   ═══════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Warm neutrals (blush-tinted) ── */
+  --color-gray-50:  #FBF5F2;
+  --color-gray-100: #F5EDE8;
+  --color-gray-200: #EBD8D0;
+  --color-gray-300: #D4B8B0;
+  --color-gray-400: #A88878;
+  --color-gray-500: #7A5848;
+  --color-gray-600: #5A3C30;
+  --color-gray-700: #3E2420;
+  --color-gray-800: #2A1410;
+  --color-gray-900: #1A0C08;
+
+  /* ── Green scale (primary) ── */
+  --color-green-50:  #F0F7F4;
+  --color-green-100: #DCEEE6;
+  --color-green-200: #B4D9C8;
+  --color-green-300: #7FBFA4;
+  --color-green-400: #4E9A7E;
+  --color-green-500: #2D7A5E;
+  --color-green-600: #2D6A4F;   /* logo forest green */
+  --color-green-700: #245840;
+  --color-green-800: #1B4430;
+  --color-green-900: #112C1E;
+
+  /* ── Gold scale (accent) ── */
+  --color-amber-50:  #FFFBF0;
+  --color-amber-100: #FEF3CC;
+  --color-amber-200: #FCE08A;
+  --color-amber-300: #F5C842;
+  --color-amber-400: #E8AE18;
+  --color-amber-500: #C9A540;   /* logo gold */
+  --color-amber-600: #A88428;
+  --color-amber-700: #856218;
+  --color-amber-800: #62440C;
+  --color-amber-900: #3E2A06;
+
+  /* ── Rose/blush pops ── */
+  --color-pink-50:  #FDF0EC;
+  --color-pink-100: #FAE0D8;
+  --color-pink-200: #F5C0B0;
+  --color-pink-300: #EC9880;
+  --color-pink-400: #E07060;
+  --color-pink-500: #C85048;
+  --color-pink-600: #A83838;
+  --color-pink-700: #882828;
+
+  /* Purple → maps to forest green for compatibility */
+  --color-purple-50:  #F0F7F4;
+  --color-purple-100: #DCEEE6;
+  --color-purple-200: #B4D9C8;
+  --color-purple-300: #7FBFA4;
+  --color-purple-400: #4E9A7E;
+  --color-purple-500: #2D7A5E;
+  --color-purple-600: #2D6A4F;
+  --color-purple-700: #245840;
+  --color-purple-800: #1B4430;
+  --color-purple-900: #112C1E;
+
+  /* Custom tokens */
+  --color-bloom-green:  #2D6A4F;
+  --color-bloom-gold:   #C9A540;
+  --color-bloom-blush:  #F9E8E4;
+  --color-bloom-cream:  #FBF5F2;
 }
 
-.dark {
-  --background: #0F0A1E;
-  --foreground: #F3E8FF;
+:root {
+  --background: #FBF5F2;
+  --foreground: #1A0C08;
+  --surface:    #FFFFFF;
+  --border:     #EBD8D0;
+  --green:      #2D6A4F;
+  --gold:       #C9A540;
+  --blush:      #F9E8E4;
+  --muted:      #7A5848;
 }
 
 body {
@@ -21,30 +89,55 @@ body {
   font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
 
+/* ── Keyframes ── */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50%       { transform: translateY(-8px); }
 }
-
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(124, 58, 237, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.6); }
+  0%, 100% { box-shadow: 0 0 8px rgba(45,106,79,0.25); }
+  50%       { box-shadow: 0 0 24px rgba(45,106,79,0.55); }
 }
-
 @keyframes confetti-fall {
-  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  0%   { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
 .float-animation { animation: float 3s ease-in-out infinite; }
-.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.pulse-glow      { animation: pulse-glow 2s ease-in-out infinite; }
 
+/* ── Primary gradient: forest green → gold ── */
 .gradient-bloom {
-  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F59E0B 100%);
+  background: linear-gradient(135deg, #2D6A4F 0%, #3D8A64 50%, #C9A540 100%);
 }
 
+/* ── Soft blush section background ── */
 .gradient-bloom-soft {
-  background: linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 50%, #FEF3C7 100%);
+  background: linear-gradient(135deg, #FBF5F2 0%, #F9EEE8 50%, #FDF5F0 100%);
+}
+
+/* ── Gold accent gradient ── */
+.gradient-gold {
+  background: linear-gradient(135deg, #C9A540 0%, #E8C050 100%);
+}
+
+/* ── Deep green (sidebar/footer) ── */
+.gradient-brown {
+  background: linear-gradient(160deg, #112C1E 0%, #1B4430 100%);
+}
+
+/* ── Gold shimmer text ── */
+.text-shimmer {
+  background: linear-gradient(90deg, #2D6A4F, #C9A540, #E8C848, #C9A540, #2D6A4F);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3.5s linear infinite;
 }
 
 .card-hover {
@@ -52,7 +145,7 @@ body {
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 20px 48px rgba(45,106,79,0.12), 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
