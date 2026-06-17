@@ -37,17 +37,37 @@ export default function DashboardPage() {
   const { progress, stats, getModuleStatus, isModuleUnlocked } = useProgress(profile?.id)
   const quote = MOTIVATIONAL_QUOTES[new Date().getDay() % MOTIVATIONAL_QUOTES.length]
 
-  const nextModule = SDG_MODULES.find(m => {
-    const status = getModuleStatus(m.id)
-    return status === 'in_progress' || status === 'locked'
-  })
+  // Find where the student left off — prefer in_progress, else first unlocked
   const currentModule = SDG_MODULES.find(m => getModuleStatus(m.id) === 'in_progress')
+  const lastCompletedId = [...SDG_MODULES].reverse().find(m => getModuleStatus(m.id) === 'completed')?.id ?? 0
+  const resumeModule = currentModule ?? SDG_MODULES.find(m => m.id === lastCompletedId + 1)
   const completedModules = SDG_MODULES.filter(m => getModuleStatus(m.id) === 'completed')
 
   const firstName = profile?.full_name?.split(' ')[0] || 'Bloom Girl'
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
+
+      {/* Resume banner — shown whenever there is somewhere to continue */}
+      {resumeModule && stats.modules_completed < 17 && (
+        <div className="mb-5 rounded-2xl border-2 flex items-center gap-4 px-5 py-4"
+          style={{ background: '#F0F7F4', borderColor: '#B4D9C8' }}>
+          <div className="text-3xl flex-shrink-0">{resumeModule.emoji}</div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wider mb-0.5" style={{ color: '#2D6A4F' }}>
+              📍 Continue where you left off
+            </p>
+            <p className="font-black text-sm truncate" style={{ color: '#1A0C08' }}>
+              SDG {resumeModule.sdg_number}: {resumeModule.title}
+            </p>
+          </div>
+          <Link href={`/modules/${resumeModule.id}`}
+            className="gradient-bloom text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex-shrink-0 flex items-center gap-1.5 shadow-md">
+            Continue <ChevronRight size={15} />
+          </Link>
+        </div>
+      )}
+
       {/* Welcome Banner */}
       <div className="gradient-bloom rounded-3xl p-6 sm:p-8 text-white mb-6 relative overflow-hidden">
         <div className="absolute right-4 top-4 text-6xl opacity-20 select-none">🌸</div>
@@ -55,12 +75,6 @@ export default function DashboardPage() {
           <p className="text-white/80 text-sm mb-1">Good to see you!</p>
           <h1 className="text-2xl sm:text-3xl font-black mb-2">Welcome back, <span className="underline decoration-white/40 decoration-2 underline-offset-4">{firstName}</span>! 🌸</h1>
           <p className="text-white/90 text-sm max-w-md">{quote}</p>
-          {currentModule && (
-            <Link href={`/modules/${currentModule.id}`}
-              className="mt-4 inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
-              Continue: SDG {currentModule.sdg_number} — {currentModule.title} <ChevronRight size={16} />
-            </Link>
-          )}
         </div>
       </div>
 
