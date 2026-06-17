@@ -1,10 +1,11 @@
 'use client'
-import { use, useState } from 'react'
+import { use, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useProgress } from '@/hooks/useProgress'
 import { getModuleById } from '@/lib/data/sdg-modules'
+import { createClient } from '@/lib/supabase/client'
 import { ChevronRight, ChevronLeft, BookOpen, Star, Target, Lightbulb, Heart, Pen, Lock } from 'lucide-react'
 
 const TABS = [
@@ -22,15 +23,32 @@ export default function ModulePage({ params }: { params: Promise<{ moduleId: str
   const { getModuleStatus, isModuleUnlocked, markModuleStarted, initialized } = useProgress(profile?.id)
   const [activeTab, setActiveTab] = useState('intro')
   const [starting, setStarting] = useState(false)
+  // Direct DB check — bypasses hook cache for guaranteed fresh unlock status
+  const [directUnlocked, setDirectUnlocked] = useState<boolean | null>(null)
 
-  const module = getModuleById(Number(moduleId))
+  const mid = Number(moduleId)
+  const module = getModuleById(mid)
+
+  useEffect(() => {
+    if (!profile?.id || mid <= 1) { setDirectUnlocked(true); return }
+    const check = async () => {
+      const supabase = createClient()
+      const [{ data: prog }, { data: attempt }] = await Promise.all([
+        supabase.from('student_progress').select('status').eq('student_id', profile.id).eq('module_id', mid - 1).single(),
+        supabase.from('quiz_attempts').select('id').eq('student_id', profile.id).eq('module_id', mid - 1).eq('passed', true).limit(1),
+      ])
+      const prevCompleted = prog?.status === 'completed'
+      const quizPassed = (attempt && attempt.length > 0)
+      setDirectUnlocked(prevCompleted || quizPassed)
+    }
+    check()
+  }, [profile?.id, mid])
+
   if (!module) return <div className="p-8 text-center text-gray-500">Module not found.</div>
 
-  // Show spinner while auth OR progress fetch is still in flight
-  const stillLoading = authLoading || (!!profile?.id && !initialized)
-
-  const status = getModuleStatus(module.id)
-  const unlocked = isModuleUnlocked(module.id)
+  const stillLoading = authLoading || directUnlocked === null
+  const unlocked = mid === 1 || directUnlocked === true || (initialized && isModuleUnlocked(mid))
+  const status = getModuleStatus(mid)
 
   if (stillLoading) {
     return (
