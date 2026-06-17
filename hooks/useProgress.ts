@@ -5,16 +5,21 @@ import { StudentProgress, ModuleStatus, DashboardStats } from '@/types'
 
 export function useProgress(userId: string | undefined) {
   const [progress, setProgress] = useState<StudentProgress[]>([])
-  const [initialized, setInitialized] = useState(false) // true once first fetch done
+  const [passedQuizzes, setPassedQuizzes] = useState<number[]>([]) // module IDs with a passed attempt
+  const [initialized, setInitialized] = useState(false)
 
   const fetchProgress = useCallback(async () => {
     if (!userId) return
     const supabase = createClient()
-    const { data } = await supabase
-      .from('student_progress')
-      .select('*')
-      .eq('student_id', userId)
-    if (data) setProgress(data as StudentProgress[])
+
+    // Fetch both in parallel
+    const [{ data: prog }, { data: attempts }] = await Promise.all([
+      supabase.from('student_progress').select('*').eq('student_id', userId),
+      supabase.from('quiz_attempts').select('module_id').eq('student_id', userId).eq('passed', true),
+    ])
+
+    if (prog) setProgress(prog as StudentProgress[])
+    if (attempts) setPassedQuizzes(attempts.map((a: { module_id: number }) => a.module_id))
     setInitialized(true)
   }, [userId])
 
@@ -25,21 +30,24 @@ export function useProgress(userId: string | undefined) {
     return p?.status ?? 'locked'
   }
 
-  // A module is unlocked if:
-  // - It's module 1 (always open)
-  // - It has its own progress row (any status != locked)
-  // - OR the previous module is completed (catches cases where row wasn't created)
+  // A module is unlocked if ANY of these are true:
+  // 1. It's module 1
+  // 2. It has its own non-locked progress row
+  // 3. The previous module is marked completed in student_progress
+  // 4. The previous module has a passed quiz attempt (fallback if upsert failed)
   const isModuleUnlocked = (moduleId: number): boolean => {
     if (moduleId === 1) return true
     if (getModuleStatus(moduleId) !== 'locked') return true
-    return getModuleStatus(moduleId - 1) === 'completed'
+    if (getModuleStatus(moduleId - 1) === 'completed') return true
+    if (passedQuizzes.includes(moduleId - 1)) return true
+    return false
   }
 
   const completedCount = progress.filter(p => p.status === 'completed').length
 
   const stats: DashboardStats = {
     modules_completed: completedCount,
-    quizzes_passed: completedCount,
+    quizzes_passed: passedQuizzes.length,
     badges_earned: 0,
     overall_percent: Math.round((completedCount / 17) * 100)
   }
@@ -67,7 +75,6 @@ export function useProgress(userId: string | undefined) {
       completed_at: new Date().toISOString()
     }, { onConflict: 'student_id,module_id' })
 
-    // Always create next module row
     if (moduleId < 17) {
       await supabase.from('student_progress').upsert({
         student_id: userId,
@@ -82,6 +89,7 @@ export function useProgress(userId: string | undefined) {
 
   return {
     progress,
+    passedQuizzes,
     loading: !initialized,
     isLoading: !initialized,
     initialized,
