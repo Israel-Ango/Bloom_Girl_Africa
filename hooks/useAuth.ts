@@ -21,16 +21,18 @@ export function useAuth() {
       if (data) setProfile(data as Profile)
     }
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      if (user) fetchProfile(user.id)
+    // getSession reads from local cache — no network round-trip
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const u = session?.user ?? null
+      setUser(u)
+      if (u) await fetchProfile(u.id)
       setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
       setUser(session?.user ?? null)
       if (session?.user) fetchProfile(session.user.id)
-      else setProfile(null)
+      else { setProfile(null); setLoading(false) }
     })
 
     return () => subscription.unsubscribe()
