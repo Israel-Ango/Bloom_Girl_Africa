@@ -15,11 +15,32 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Client-side validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(form.email)) {
+      setError('Please enter a valid email address (e.g. name@example.com).')
+      return
+    }
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters long.')
+      return
+    }
+
     setLoading(true)
     const supabase = createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
     setLoading(false)
-    if (signInError) { setError(signInError.message); return }
+    if (signInError) {
+      if (signInError.message.toLowerCase().includes('invalid')) {
+        setError('Incorrect email or password. Please try again.')
+      } else if (signInError.message.toLowerCase().includes('email not confirmed')) {
+        setError('Please verify your email first. Check your inbox for a confirmation link.')
+      } else {
+        setError(signInError.message)
+      }
+      return
+    }
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()

@@ -53,7 +53,7 @@ export default function DashboardPage() {
         <div className="absolute right-4 top-4 text-6xl opacity-20 select-none">🌸</div>
         <div className="relative">
           <p className="text-white/80 text-sm mb-1">Good to see you!</p>
-          <h1 className="text-2xl sm:text-3xl font-black mb-2">Welcome back, {firstName}! 🌸</h1>
+          <h1 className="text-2xl sm:text-3xl font-black mb-2">Welcome back, <span className="underline decoration-white/40 decoration-2 underline-offset-4">{firstName}</span>! 🌸</h1>
           <p className="text-white/90 text-sm max-w-md">{quote}</p>
           {currentModule && (
             <Link href={`/modules/${currentModule.id}`}
