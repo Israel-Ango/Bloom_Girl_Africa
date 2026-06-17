@@ -18,18 +18,21 @@ const TABS = [
 export default function ModulePage({ params }: { params: Promise<{ moduleId: string }> }) {
   const { moduleId } = use(params)
   const router = useRouter()
-  const { profile } = useAuth()
-  const { getModuleStatus, isModuleUnlocked, markModuleStarted, isLoading } = useProgress(profile?.id)
+  const { profile, loading: authLoading } = useAuth()
+  const { getModuleStatus, isModuleUnlocked, markModuleStarted, initialized } = useProgress(profile?.id)
   const [activeTab, setActiveTab] = useState('intro')
   const [starting, setStarting] = useState(false)
 
   const module = getModuleById(Number(moduleId))
   if (!module) return <div className="p-8 text-center text-gray-500">Module not found.</div>
 
+  // Show spinner while auth OR progress fetch is still in flight
+  const stillLoading = authLoading || (!!profile?.id && !initialized)
+
   const status = getModuleStatus(module.id)
   const unlocked = isModuleUnlocked(module.id)
 
-  if (isLoading) {
+  if (stillLoading) {
     return (
       <div className="p-8 max-w-2xl mx-auto text-center">
         <div className="w-12 h-12 rounded-full gradient-bloom mx-auto mb-4 animate-spin" style={{ background: 'conic-gradient(#2D6A4F, #C9A540, #2D6A4F)' }} />

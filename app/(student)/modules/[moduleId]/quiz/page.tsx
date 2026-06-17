@@ -14,8 +14,8 @@ type Phase = 'instructions' | 'quiz' | 'results'
 export default function QuizPage({ params }: { params: Promise<{ moduleId: string }> }) {
   const { moduleId } = use(params)
   const router = useRouter()
-  const { profile } = useAuth()
-  const { getModuleStatus, isModuleUnlocked, markModuleCompleted, isLoading } = useProgress(profile?.id)
+  const { profile, loading: authLoading } = useAuth()
+  const { getModuleStatus, isModuleUnlocked, markModuleCompleted, initialized } = useProgress(profile?.id)
 
   const module = getModuleById(Number(moduleId))
   const quizSet = getQuizByModuleId(Number(moduleId))
@@ -31,10 +31,11 @@ export default function QuizPage({ params }: { params: Promise<{ moduleId: strin
 
   if (!module || !quizSet) return <div className="p-8 text-center text-gray-500">Quiz not found.</div>
 
+  const stillLoading = authLoading || (!!profile?.id && !initialized)
   const status = getModuleStatus(module.id)
   const unlocked = isModuleUnlocked(module.id)
 
-  if (isLoading) {
+  if (stillLoading) {
     return (
       <div className="p-8 max-w-2xl mx-auto text-center">
         <div className="w-12 h-12 rounded-full gradient-bloom mx-auto mb-4 animate-spin" style={{ background: 'conic-gradient(#2D6A4F, #C9A540, #2D6A4F)' }} />
