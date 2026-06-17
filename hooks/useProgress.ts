@@ -76,5 +76,5 @@ export function useProgress(userId: string | undefined) {
     fetchProgress()
   }
 
-  return { progress, loading, getModuleStatus, isModuleUnlocked, stats, markModuleStarted, markModuleCompleted, refetch: fetchProgress }
+  return { progress, loading, getModuleStatus, isModuleUnlocked, stats, markModuleStarted, markModuleCompleted, refetch: fetchProgress, isLoading: loading }
 }

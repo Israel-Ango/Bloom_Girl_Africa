@@ -19,7 +19,7 @@ export default function ModulePage({ params }: { params: Promise<{ moduleId: str
   const { moduleId } = use(params)
   const router = useRouter()
   const { profile } = useAuth()
-  const { getModuleStatus, isModuleUnlocked, markModuleStarted } = useProgress(profile?.id)
+  const { getModuleStatus, isModuleUnlocked, markModuleStarted, isLoading } = useProgress(profile?.id)
   const [activeTab, setActiveTab] = useState('intro')
   const [starting, setStarting] = useState(false)
 
@@ -28,6 +28,15 @@ export default function ModulePage({ params }: { params: Promise<{ moduleId: str
 
   const status = getModuleStatus(module.id)
   const unlocked = isModuleUnlocked(module.id)
+
+  if (isLoading) {
+    return (
+      <div className="p-8 max-w-2xl mx-auto text-center">
+        <div className="w-12 h-12 rounded-full gradient-bloom mx-auto mb-4 animate-spin" style={{ background: 'conic-gradient(#2D6A4F, #C9A540, #2D6A4F)' }} />
+        <p className="text-sm font-semibold" style={{ color: '#2D6A4F' }}>Loading module...</p>
+      </div>
+    )
+  }
 
   if (!unlocked) {
     return (
