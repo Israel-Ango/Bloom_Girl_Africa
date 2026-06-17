@@ -96,7 +96,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       {/* Mobile header */}
       <header className="md:hidden fixed top-0 w-full z-40 px-4 h-14 flex items-center justify-between border-b"
         style={{ background: '#1B4430', borderColor: 'rgba(255,255,255,0.08)' }}>
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <img src="/logo.png" className="w-8 h-8 rounded-lg object-contain" alt="logo" style={{ background: '#F9E8E4', padding: '2px' }} />
           <span className="font-black text-white text-sm">Bloom Girl Africa</span>
         </Link>

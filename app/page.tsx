@@ -108,7 +108,7 @@ export default function LandingPage() {
             {/* Mobile hero image */}
             <div className="lg:hidden w-full max-w-sm mx-auto">
               <div className="rounded-3xl overflow-hidden shadow-xl" style={{ border: '4px solid white', height: '280px' }}>
-                <img src={HERO_IMAGES[0]} alt="African girl learning" className="w-full h-full object-cover object-top" />
+                <img src={HERO_IMAGES[1]} alt="African girl learning" className="w-full h-full object-cover object-top" />
               </div>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function LandingPage() {
         <div className="rounded-3xl overflow-hidden shadow-md border bg-white" style={{ borderColor: '#EBD8D0' }}>
           <div className="flex flex-col sm:flex-row">
             <div className="sm:w-64 flex-shrink-0">
-              <img src="/founder.jpg" alt="Israel Ango — Founder"
+              <img src="/founder12.jpg" alt="Israel Ango — Founder"
                 className="w-full h-64 sm:h-full object-cover object-top" />
             </div>
             <div className="flex-1 p-8 sm:p-10 flex flex-col justify-center">
