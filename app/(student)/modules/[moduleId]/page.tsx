@@ -30,16 +30,22 @@ export default function ModulePage({ params }: { params: Promise<{ moduleId: str
   const module = getModuleById(mid)
 
   useEffect(() => {
-    if (!profile?.id || mid <= 1) { setDirectUnlocked(true); return }
+    if (!profile?.id) return
+    if (mid <= 1) { setDirectUnlocked(true); return }
+
+    // Check sessionStorage cache first — instant if already verified this session
+    const cacheKey = `unlocked_${profile.id}_${mid}`
+    if (sessionStorage.getItem(cacheKey) === 'true') { setDirectUnlocked(true); return }
+
     const check = async () => {
       const supabase = createClient()
       const [{ data: prog }, { data: attempt }] = await Promise.all([
         supabase.from('student_progress').select('status').eq('student_id', profile.id).eq('module_id', mid - 1).single(),
         supabase.from('quiz_attempts').select('id').eq('student_id', profile.id).eq('module_id', mid - 1).eq('passed', true).limit(1),
       ])
-      const prevCompleted = prog?.status === 'completed'
-      const quizPassed = (attempt && attempt.length > 0)
-      setDirectUnlocked(prevCompleted || quizPassed)
+      const result = prog?.status === 'completed' || (attempt !== null && attempt.length > 0)
+      if (result) sessionStorage.setItem(cacheKey, 'true') // cache for this session
+      setDirectUnlocked(result)
     }
     check()
   }, [profile?.id, mid])

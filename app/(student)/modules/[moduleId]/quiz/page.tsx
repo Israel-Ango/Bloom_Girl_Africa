@@ -36,13 +36,20 @@ export default function QuizPage({ params }: { params: Promise<{ moduleId: strin
   useEffect(() => {
     if (!profile?.id) return
     if (mid <= 1) { setDirectUnlocked(true); return }
+
+    // Instant if module page already verified unlock this session
+    const cacheKey = `unlocked_${profile.id}_${mid}`
+    if (sessionStorage.getItem(cacheKey) === 'true') { setDirectUnlocked(true); return }
+
     const check = async () => {
       const supabase = createClient()
       const [{ data: prog }, { data: attempt }] = await Promise.all([
         supabase.from('student_progress').select('status').eq('student_id', profile.id).eq('module_id', mid - 1).single(),
         supabase.from('quiz_attempts').select('id').eq('student_id', profile.id).eq('module_id', mid - 1).eq('passed', true).limit(1),
       ])
-      setDirectUnlocked(prog?.status === 'completed' || (attempt !== null && attempt.length > 0))
+      const result = prog?.status === 'completed' || (attempt !== null && attempt.length > 0)
+      if (result) sessionStorage.setItem(cacheKey, 'true')
+      setDirectUnlocked(result)
     }
     check()
   }, [profile?.id, mid])
@@ -107,6 +114,8 @@ export default function QuizPage({ params }: { params: Promise<{ moduleId: strin
       })
 
       if (didPass) {
+        // Cache next module as unlocked so it opens instantly
+        if (mid < 17) sessionStorage.setItem(`unlocked_${profile.id}_${mid + 1}`, 'true')
         await markModuleCompleted(mid)
 
         // Award badges
