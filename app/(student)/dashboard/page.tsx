@@ -181,15 +181,15 @@ export default function DashboardPage() {
       )}
 
       {/* Next Module CTA */}
-      {nextModule && stats.modules_completed < 17 && (
+      {resumeModule && stats.modules_completed < 17 && (
         <div className="mt-6">
-          <div className="rounded-2xl p-6 text-white relative overflow-hidden" style={{ backgroundColor: nextModule.color }}>
-            <div className="absolute right-4 top-4 text-5xl opacity-20">{nextModule.emoji}</div>
+          <div className="rounded-2xl p-6 text-white relative overflow-hidden" style={{ backgroundColor: resumeModule.color }}>
+            <div className="absolute right-4 top-4 text-5xl opacity-20">{resumeModule.emoji}</div>
             <div className="relative">
               <p className="text-white/80 text-sm mb-1">Next Up</p>
-              <h3 className="text-xl font-black mb-1">SDG {nextModule.sdg_number}: {nextModule.title}</h3>
-              <p className="text-white/80 text-sm mb-4">{nextModule.description}</p>
-              <Link href={`/modules/${nextModule.id}`}
+              <h3 className="text-xl font-black mb-1">SDG {resumeModule.sdg_number}: {resumeModule.title}</h3>
+              <p className="text-white/80 text-sm mb-4">{resumeModule.description}</p>
+              <Link href={`/modules/${resumeModule.id}`}
                 className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">
                 Start Module <ChevronRight size={16} />
               </Link>
