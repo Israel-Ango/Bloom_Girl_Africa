@@ -5,10 +5,12 @@ import { StudentProgress, ModuleStatus, DashboardStats } from '@/types'
 
 export function useProgress(userId: string | undefined) {
   const [progress, setProgress] = useState<StudentProgress[]>([])
-  const [loading, setLoading] = useState(true)
+  // Start as false — the student layout already handles auth loading
+  const [loading, setLoading] = useState(false)
 
   const fetchProgress = useCallback(async () => {
     if (!userId) return
+    setLoading(true)
     const supabase = createClient()
     const { data } = await supabase
       .from('student_progress')
@@ -54,6 +56,8 @@ export function useProgress(userId: string | undefined) {
   const markModuleCompleted = async (moduleId: number) => {
     if (!userId) return
     const supabase = createClient()
+
+    // Mark current module completed
     await supabase.from('student_progress').upsert({
       student_id: userId,
       module_id: moduleId,
@@ -61,20 +65,28 @@ export function useProgress(userId: string | undefined) {
       completed_at: new Date().toISOString()
     }, { onConflict: 'student_id,module_id' })
 
-    // Unlock next module
+    // Always unlock next module — don't rely on stale state to decide
     if (moduleId < 17) {
-      const nextStatus = getModuleStatus(moduleId + 1)
-      if (nextStatus === 'locked') {
-        await supabase.from('student_progress').upsert({
-          student_id: userId,
-          module_id: moduleId + 1,
-          status: 'in_progress'
-        }, { onConflict: 'student_id,module_id' })
-      }
+      await supabase.from('student_progress').upsert({
+        student_id: userId,
+        module_id: moduleId + 1,
+        status: 'in_progress',
+        started_at: new Date().toISOString()
+      }, { onConflict: 'student_id,module_id' })
     }
 
-    fetchProgress()
+    await fetchProgress()
   }
 
-  return { progress, loading, getModuleStatus, isModuleUnlocked, stats, markModuleStarted, markModuleCompleted, refetch: fetchProgress, isLoading: loading }
+  return {
+    progress,
+    loading,
+    isLoading: loading,
+    getModuleStatus,
+    isModuleUnlocked,
+    stats,
+    markModuleStarted,
+    markModuleCompleted,
+    refetch: fetchProgress,
+  }
 }
