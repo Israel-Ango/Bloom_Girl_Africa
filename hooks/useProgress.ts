@@ -5,19 +5,17 @@ import { StudentProgress, ModuleStatus, DashboardStats } from '@/types'
 
 export function useProgress(userId: string | undefined) {
   const [progress, setProgress] = useState<StudentProgress[]>([])
-  // Start as false — the student layout already handles auth loading
-  const [loading, setLoading] = useState(false)
+  const [initialized, setInitialized] = useState(false) // true once first fetch done
 
   const fetchProgress = useCallback(async () => {
     if (!userId) return
-    setLoading(true)
     const supabase = createClient()
     const { data } = await supabase
       .from('student_progress')
       .select('*')
       .eq('student_id', userId)
     if (data) setProgress(data as StudentProgress[])
-    setLoading(false)
+    setInitialized(true)
   }, [userId])
 
   useEffect(() => { fetchProgress() }, [fetchProgress])
@@ -27,9 +25,14 @@ export function useProgress(userId: string | undefined) {
     return p?.status ?? 'locked'
   }
 
+  // A module is unlocked if:
+  // - It's module 1 (always open)
+  // - It has its own progress row (any status != locked)
+  // - OR the previous module is completed (catches cases where row wasn't created)
   const isModuleUnlocked = (moduleId: number): boolean => {
     if (moduleId === 1) return true
-    return getModuleStatus(moduleId) !== 'locked'
+    if (getModuleStatus(moduleId) !== 'locked') return true
+    return getModuleStatus(moduleId - 1) === 'completed'
   }
 
   const completedCount = progress.filter(p => p.status === 'completed').length
@@ -57,7 +60,6 @@ export function useProgress(userId: string | undefined) {
     if (!userId) return
     const supabase = createClient()
 
-    // Mark current module completed
     await supabase.from('student_progress').upsert({
       student_id: userId,
       module_id: moduleId,
@@ -65,7 +67,7 @@ export function useProgress(userId: string | undefined) {
       completed_at: new Date().toISOString()
     }, { onConflict: 'student_id,module_id' })
 
-    // Always unlock next module — don't rely on stale state to decide
+    // Always create next module row
     if (moduleId < 17) {
       await supabase.from('student_progress').upsert({
         student_id: userId,
@@ -80,8 +82,9 @@ export function useProgress(userId: string | undefined) {
 
   return {
     progress,
-    loading,
-    isLoading: loading,
+    loading: !initialized,
+    isLoading: !initialized,
+    initialized,
     getModuleStatus,
     isModuleUnlocked,
     stats,
