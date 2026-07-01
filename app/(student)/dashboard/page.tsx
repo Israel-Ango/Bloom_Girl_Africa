@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useProgress } from '@/hooks/useProgress'
 import { SDG_MODULES } from '@/lib/data/sdg-modules'
 import Link from 'next/link'
-import { Lock, CheckCircle, PlayCircle, ChevronRight, Trophy, BookOpen, Star, Zap } from 'lucide-react'
+import { Lock, CheckCircle, PlayCircle, ChevronRight, Award, GraduationCap, ClipboardCheck, TrendingUp } from 'lucide-react'
 
 const MOTIVATIONAL_QUOTES = [
   "Every lesson you complete brings you closer to changing your world. 🌍",
@@ -81,17 +81,26 @@ export default function DashboardPage() {
       {/* Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Modules Done', value: stats.modules_completed, max: 17, icon: BookOpen, color: 'text-purple-600', bg: 'bg-purple-50' },
-          { label: 'Quizzes Passed', value: stats.quizzes_passed, max: 17, icon: Star, color: 'text-pink-600', bg: 'bg-pink-50' },
-          { label: 'Badges Earned', value: stats.badges_earned, max: 7, icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Progress', value: `${stats.overall_percent}%`, max: null, icon: Zap, color: 'text-green-600', bg: 'bg-green-50' },
-        ].map(({ label, value, max, icon: Icon, color, bg }) => (
-          <div key={label} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className={`w-9 h-9 ${bg} rounded-xl flex items-center justify-center mb-3`}>
-              <Icon size={18} className={color} />
+          { label: 'Modules Done', value: stats.modules_completed, max: 17, icon: GraduationCap, gradient: 'linear-gradient(135deg, #7C3AED, #A855F7)', bar: stats.modules_completed / 17 },
+          { label: 'Quizzes Passed', value: stats.quizzes_passed, max: 17, icon: ClipboardCheck, gradient: 'linear-gradient(135deg, #EC4899, #F472B6)', bar: stats.quizzes_passed / 17 },
+          { label: 'Badges Earned', value: stats.badges_earned, max: 7, icon: Award, gradient: 'linear-gradient(135deg, #D97706, #FBBF24)', bar: stats.badges_earned / 7 },
+          { label: 'Progress', value: `${stats.overall_percent}%`, max: null, icon: TrendingUp, gradient: 'linear-gradient(135deg, #059669, #34D399)', bar: stats.overall_percent / 100 },
+        ].map(({ label, value, max, icon: Icon, gradient, bar }) => (
+          <div key={label} className="relative rounded-2xl p-4 overflow-hidden text-white shadow-md"
+            style={{ background: gradient }}>
+            <div className="absolute inset-0 opacity-10" style={{ background: 'radial-gradient(circle at top right, white, transparent)' }} />
+            <div className="relative">
+              <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center mb-3 backdrop-blur-sm">
+                <Icon size={18} className="text-white" />
+              </div>
+              <div className="text-2xl font-black text-white leading-none">
+                {value}{max ? <span className="text-sm font-normal text-white/70">/{max}</span> : ''}
+              </div>
+              <div className="text-xs text-white/80 mt-1">{label}</div>
+              <div className="mt-3 h-1 rounded-full bg-white/20">
+                <div className="h-1 rounded-full bg-white/70 transition-all duration-700" style={{ width: `${Math.min(bar * 100, 100)}%` }} />
+              </div>
             </div>
-            <div className="text-2xl font-black text-gray-900">{value}{max ? <span className="text-sm font-normal text-gray-400">/{max}</span> : ''}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{label}</div>
           </div>
         ))}
       </div>
