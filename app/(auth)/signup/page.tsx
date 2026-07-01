@@ -33,7 +33,7 @@ export default function SignupPage() {
     setError('')
     if (form.password !== form.confirm_password) { setError('Passwords do not match.'); return }
     if (form.password.length < 8) { setError('Password must be at least 8 characters.'); return }
-    if (Number(form.age) < 10 || Number(form.age) > 25) { setError('Age must be between 10 and 25.'); return }
+    if (Number(form.age) < 1) { setError('Please enter a valid age.'); return }
 
     setLoading(true)
     const supabase = createClient()
@@ -109,7 +109,7 @@ export default function SignupPage() {
               </div>
               <div>
                 <label className="text-sm font-semibold text-gray-700 block mb-1">Age *</label>
-                <input name="age" type="number" required value={form.age} onChange={handleChange} placeholder="e.g. 15" min="10" max="25"
+                <input name="age" type="number" required value={form.age} onChange={handleChange} placeholder="e.g. 15" min="1"
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
               </div>
             </div>
